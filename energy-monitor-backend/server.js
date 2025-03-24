@@ -1,20 +1,13 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
+import express from "express";
+import connectDB from "./config/db.js";
+import consumptionRoutes from "./routes/consumptionRoutes.js";
 
 const app = express();
-app.use(express.json());
-app.use(cors());
+connectDB();
 
-// MongoDB kapcsolat
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error(err));
+app.use(express.json()); // JSON adatok kezelése
+app.use("/api/consumption", consumptionRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Szia! A szerver fut.");
+app.listen(5000, () => {
+  console.log("🚀 Server running on port 5000");
 });
-
-const PORT = process.env.PORT || 5000;
