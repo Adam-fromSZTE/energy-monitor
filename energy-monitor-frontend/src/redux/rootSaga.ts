@@ -1,6 +1,6 @@
-import { all } from "redux-saga/effects";
-import { consumptionSaga } from "../features/cosumption/saga";
+import { call } from 'redux-saga/effects';
+import { consumptionSaga } from '../features/consumption/saga';
 
 export default function* rootSaga() {
-  yield all([consumptionSaga()]);
+	yield call(consumptionSaga);
 }

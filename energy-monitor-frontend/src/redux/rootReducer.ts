@@ -1,8 +1,8 @@
-import { combineReducers } from "@reduxjs/toolkit";
-import consumptionReducer from "../features/cosumption/slice";
+import { combineReducers } from '@reduxjs/toolkit';
+import consumptionReducer from '../features/consumption/slice';
 
 const rootReducer = combineReducers({
-  consumption: consumptionReducer,
+	consumption: consumptionReducer,
 });
 
 export default rootReducer;
