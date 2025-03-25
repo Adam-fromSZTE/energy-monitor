@@ -1,18 +1,18 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from "react";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import ConsumptionPage from "./pages/ConsumptionPage";
 import Navbar from "./components/Navbar";
-import WaterPage from "./pages/water/page";
-import GasPage from "./pages/gas/page";
-import ElectricityPage from "./pages/electricity/page";
 
-export default function App() {
+const App: React.FC = () => {
   return (
-    <Router>
+    <Provider store={store}>
       <Navbar />
-      <Routes>
-        <Route path="/water" element={<WaterPage />} />
-        <Route path="/gas" element={<GasPage />} />
-        <Route path="/electricity" element={<ElectricityPage />} />
-      </Routes>
-    </Router>
+      <div className="container mx-auto p-4">
+        <ConsumptionPage />
+      </div>
+    </Provider>
   );
-}
+};
+
+export default App;
