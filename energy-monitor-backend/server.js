@@ -1,13 +1,22 @@
+// server.js
 import express from "express";
+import cors from "cors";
 import connectDB from "./config/db.js";
-import consumptionRoutes from "./routes/consumptionRoutes.js";
 
 const app = express();
-connectDB();
+const PORT = process.env.PORT || 5000;
 
-app.use(express.json()); // JSON adatok kezelése
-app.use("/api/consumption", consumptionRoutes);
+// Middleware
+app.use(express.json());
+app.use(cors());
 
-app.listen(5000, () => {
-  console.log("🚀 Server running on port 5000");
+// MongoDB connection
+await connectDB();
+
+// Basic route
+app.get("/", (req, res) => {
+  res.send("Energy Monitor API is running");
 });
+
+// Start
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
