@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ElectricitySchema = new mongoose.Schema({
-  date: { type: Date, required: true },
-  generation: Number,
-  hourly_outgoing: Number,
-  hourly_incoming: Number,
+	date: { type: Date, required: true },
+	generation: Number,
+	hourly_outgoing: Number,
+	hourly_incoming: Number,
 });
 
-module.exports = mongoose.model("ElectricityData", ElectricitySchema);
+export default mongoose.model("ElectricityData", ElectricitySchema);
