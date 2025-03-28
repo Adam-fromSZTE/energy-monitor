@@ -1,14 +1,52 @@
 import Consumption from '../models/Consumption.js';
 
-// Összes mérő aktuális állása
 export const getConsumptions = async (req, res) => {
 	try {
 		const { type } = req.query;
 
-		const query = {};
-		if (type) query.type = type;
+		const pipeline = [
+			// Filter by type (if have)
+			...(type ? [{ $match: { type } }] : []),
 
-		const consumptions = await Consumption.find(query).sort({ date: 1 }); // 1 = növekvő, -1 = csökkenő sorrend
+			// Sort by date
+			{ $sort: { date: 1 } },
+
+			// Get prevoius field clock value
+			{
+				$setWindowFields: {
+					partitionBy: '$type', // Group by type
+					sortBy: { date: 1 },
+					output: {
+						previousActClock: {
+							$shift: {
+								output: '$actClock',
+								by: -1,
+								default: null,
+							},
+						},
+					},
+				},
+			},
+
+			// Calculate consumption: actClock - previousActClock
+			{
+				$addFields: {
+					amount: {
+						$cond: [
+							{ $eq: ['$previousActClock', null] }, // If no previous data
+							null,
+							{ $subtract: ['$actClock', '$previousActClock'] },
+						],
+					},
+				},
+			},
+
+			// Delete temporary field
+			{ $project: { previousActClock: 0 } },
+		];
+
+		// Run aggregation
+		const consumptions = await Consumption.aggregate(pipeline);
 
 		res.json(consumptions);
 	} catch (err) {
@@ -16,12 +54,10 @@ export const getConsumptions = async (req, res) => {
 	}
 };
 
-// Adatrögzítés
-
-// Adatrögzítés
+// Add data
 export const createConsumption = async (req, res) => {
 	try {
-		const { type, date, amount } = req.body;
+		const { type, date, actClock } = req.body;
 
 		const inputDate = new Date(date);
 
@@ -35,13 +71,13 @@ export const createConsumption = async (req, res) => {
 
 		let result;
 		if (existing) {
-			existing.amount = amount;
+			existing.actClock = actClock;
 			result = await existing.save();
 		} else {
 			result = await new Consumption({
 				type,
 				date: inputDate,
-				amount: amount,
+				actClock: actClock,
 			}).save();
 		}
 

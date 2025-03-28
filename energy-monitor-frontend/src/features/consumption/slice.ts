@@ -1,5 +1,5 @@
 // src/features/consumption/consumptionSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { ConsumptionType } from './enum';
 import { addConsumption, fetchAllConsumptions } from './generator';
 import { Consumption, ConsumptionState } from './types';
@@ -47,31 +47,7 @@ const consumptionSlice = createSlice({
 			.addCase(addConsumption.pending, (state) => {
 				state.status = 'loading';
 			})
-			.addCase(addConsumption.fulfilled, (state, action: PayloadAction<Consumption>) => {
-				const { type } = action.payload;
-
-				// Típusbiztos hozzáférés az adattömbhöz
-				const typeKey = type as ConsumptionType;
-				if (!state.data[typeKey]) {
-					state.data[typeKey] = [];
-				}
-
-				// Dátum alapján keresés típusbiztos módon
-				const existingIndex =
-					state.data[typeKey]?.findIndex(
-						(item: Consumption) =>
-							new Date(item.date).toDateString() ===
-							new Date(action.payload.date).toDateString(),
-					) ?? -1;
-
-				if (existingIndex >= 0 && state.data[typeKey]) {
-					// Frissítés
-					state.data[typeKey]![existingIndex] = action.payload;
-				} else if (state.data[typeKey]) {
-					// Új elem
-					state.data[typeKey]!.push(action.payload);
-				}
-
+			.addCase(addConsumption.fulfilled, (state) => {
 				state.status = 'succeeded';
 			})
 			.addCase(addConsumption.rejected, (state, action) => {

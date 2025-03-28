@@ -2,16 +2,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { unitLabels } from '../features/consumption/constants';
 import { ConsumptionType } from '../features/consumption/enum';
-import { addConsumption } from '../features/consumption/generator';
+import { addConsumption, fetchAllConsumptions } from '../features/consumption/generator';
 import { selectConsumptionType, selectCurrentConsumptions } from '../features/consumption/selector';
-import { Consumption } from '../features/consumption/types';
+import { AddConsumptionRequest } from '../features/consumption/types';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import DatePickerField from './DatePickerField';
 
 const ConsumptionForm = () => {
 	const [date, setDate] = useState<Date>(new Date());
 	const [amount, setAmount] = useState<string>('');
-	const [existingData, setExistingData] = useState<{ amount: number } | null>(null);
+	const [existingData, setExistingData] = useState<{ actClock: number } | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -24,9 +24,11 @@ const ConsumptionForm = () => {
 			(item) => new Date(item.date).toDateString() === date.toDateString(),
 		);
 
-		setExistingData(existing ? { amount: existing.amount } : null);
+		setExistingData(existing ? { actClock: existing.actClock } : null);
 		if (existing) {
-			setAmount(existing.amount.toString());
+			if (existing.actClock) {
+				setAmount(existing.actClock.toString());
+			}
 		} else {
 			setAmount('');
 		}
@@ -44,10 +46,10 @@ const ConsumptionForm = () => {
 			setIsSubmitting(true);
 			setError(null);
 
-			const newConsumption: Consumption = {
+			const newConsumption: AddConsumptionRequest = {
 				type: currentType,
 				date,
-				amount: parseFloat(amount),
+				actClock: parseFloat(amount),
 			};
 
 			try {
@@ -58,6 +60,7 @@ const ConsumptionForm = () => {
 				setError(err.message || 'Hiba történt a mentés során');
 				console.error('Mentési hiba:', err);
 			} finally {
+				await dispatch(fetchAllConsumptions());
 				setIsSubmitting(false);
 			}
 		},
@@ -72,7 +75,7 @@ const ConsumptionForm = () => {
 
 			{existingData && (
 				<div className="mb-4 rounded-lg bg-yellow-100 p-3 text-yellow-800">
-					Figyelem! Erre a dátumra már van rögzített adat ({existingData.amount}{' '}
+					Figyelem! Erre a dátumra már van rögzített adat ({existingData.actClock}{' '}
 					{unitLabels[currentType]}), ami felülírásra kerül.
 				</div>
 			)}
@@ -91,7 +94,12 @@ const ConsumptionForm = () => {
 
 				<div>
 					<label className="mb-1 block text-sm font-medium text-gray-700">
-						Mennyiség ({unitLabels[currentType]})
+						{currentType === ConsumptionType.WATER
+							? 'Víz'
+							: currentType === ConsumptionType.GAS
+								? 'Gáz'
+								: 'Villany'}{' '}
+						óra állás ({unitLabels[currentType]})
 					</label>
 					<input
 						type="number"
@@ -107,7 +115,7 @@ const ConsumptionForm = () => {
 								: currentType === ConsumptionType.GAS
 									? 'gáz'
 									: 'villany'
-						} fogyasztást`}
+						} óra állását`}
 					/>
 				</div>
 

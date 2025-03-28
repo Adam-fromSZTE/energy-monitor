@@ -1,20 +1,20 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { NewConsumption } from './types';
+import { AddConsumptionRequest, Consumption } from './types';
 
 // Fetch all consumptions at once
 export const fetchAllConsumptions = createAsyncThunk('consumptions/fetchAll', async () => {
-	const response = await axios.get('http://localhost:5000/api/consumptions');
+	const response = await axios.get<Consumption[]>('http://localhost:5000/api/consumptions');
 	return response.data;
 });
 
 export const addConsumption = createAsyncThunk(
 	'consumption/addConsumption',
-	async (consumptionData: NewConsumption, { rejectWithValue }) => {
+	async (addConsumptionRequest: AddConsumptionRequest, { rejectWithValue }) => {
 		try {
 			const response = await axios.post('http://localhost:5000/api/consumptions', {
-				...consumptionData,
-				date: consumptionData.date.toISOString(),
+				...addConsumptionRequest,
+				date: addConsumptionRequest.date.toISOString(),
 			});
 			return response.data;
 		} catch (err) {

@@ -11,7 +11,7 @@ const consumptionSchema = new mongoose.Schema({
 		required: true,
 		index: true,
 	},
-	amount: {
+	actClock: {
 		type: Number,
 		required: true,
 		min: 0,

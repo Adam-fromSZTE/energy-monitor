@@ -12,5 +12,12 @@ export interface ConsumptionState {
 export interface Consumption {
 	type: ConsumptionType;
 	date: Date;
+	actClock: number;
 	amount: number;
+}
+
+export interface AddConsumptionRequest {
+	type: ConsumptionType;
+	date: Date;
+	actClock: number;
 }
