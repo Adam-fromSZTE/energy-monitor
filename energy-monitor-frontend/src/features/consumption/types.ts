@@ -1,14 +1,16 @@
-import { ConsumptionStatus, ConsumptionType } from './enum';
+import { ConsumptionType } from './enum';
 
 export interface ConsumptionState {
-	data?: ConsumptionData;
-	status: ConsumptionStatus;
-	error?: string;
-	type: ConsumptionType;
+	currentType: ConsumptionType;
+	data: {
+		[key in ConsumptionType]?: Consumption[];
+	};
+	status: 'idle' | 'loading' | 'succeeded' | 'failed';
+	error: string | null;
 }
 
-export interface ConsumptionData {
-	water: string;
-	electricity: string;
-	gas: string;
+export interface Consumption {
+	type: ConsumptionType;
+	date: Date;
+	amount: number;
 }

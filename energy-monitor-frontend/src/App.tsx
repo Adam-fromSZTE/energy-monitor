@@ -1,18 +1,22 @@
-import React from 'react';
 import { Provider } from 'react-redux';
+import DashboardLayout from './components/DashboardLayout';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
-import ConsumptionPage from './pages/ConsumptionPage';
-import store from './redux/store';
+import { store } from './redux/store';
 
-const App: React.FC = () => {
+function App() {
 	return (
 		<Provider store={store}>
-			<Navbar />
-			<div className="container mx-auto p-4">
-				<ConsumptionPage />
+			<div className="min-h-screen bg-gray-50">
+				<Navbar />
+				<main className="container mx-auto px-4 py-6">
+					<ErrorBoundary>
+						<DashboardLayout />
+					</ErrorBoundary>
+				</main>
 			</div>
 		</Provider>
 	);
-};
+}
 
 export default App;

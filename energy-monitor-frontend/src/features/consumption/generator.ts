@@ -1,3 +1,27 @@
-import { ConsumptionData } from './types';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { NewConsumption } from './types';
 
-export function* fetchConsumptionData() {}
+// Fetch all consumptions at once
+export const fetchAllConsumptions = createAsyncThunk('consumptions/fetchAll', async () => {
+	const response = await axios.get('http://localhost:5000/api/consumptions');
+	return response.data;
+});
+
+export const addConsumption = createAsyncThunk(
+	'consumption/addConsumption',
+	async (consumptionData: NewConsumption, { rejectWithValue }) => {
+		try {
+			const response = await axios.post('http://localhost:5000/api/consumptions', {
+				...consumptionData,
+				date: consumptionData.date.toISOString(),
+			});
+			return response.data;
+		} catch (err) {
+			if (axios.isAxiosError(err)) {
+				return rejectWithValue(err.response?.data?.message || err.message);
+			}
+			return rejectWithValue('Ismeretlen hiba történt');
+		}
+	},
+);

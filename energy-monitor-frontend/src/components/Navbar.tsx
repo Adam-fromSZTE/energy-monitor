@@ -1,39 +1,36 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ConsumptionType } from '../features/consumption/enum';
-import { selectConsumptionType } from '../features/consumption/selector';
-import { setConsumptionType } from '../features/consumption/slice';
-import { RootState } from '../redux/store';
+// components/Navbar.jsx
 
-const Navbar: React.FC = () => {
-	const dispatch = useDispatch();
-	const consumptionType = useSelector((state: RootState) => selectConsumptionType(state));
+import { ConsumptionType } from '../features/consumption/enum';
+import { setType } from '../features/consumption/slice';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+
+const types = [
+	{ id: ConsumptionType.WATER, label: 'Víz', icon: '💧' },
+	{ id: ConsumptionType.GAS, label: 'Gáz', icon: '🔥' },
+	{ id: ConsumptionType.ELECTRICITY, label: 'Villany', icon: '⚡' },
+];
+
+const Navbar = () => {
+	const dispatch = useAppDispatch();
+
+	const handleTypeChange = (type: ConsumptionType) => {
+		// Dispatch both setType and fetchConsumptions
+		dispatch(setType(type));
+	};
 
 	return (
-		<nav className="bg-blue-600 p-4 text-white shadow-md">
-			<div className="container mx-auto flex items-center justify-between">
-				<h1 className="text-xl font-bold">Energy Monitor</h1>
-
-				<div className="flex space-x-4">
+		<nav className="bg-gray-800 p-4">
+			<div className="flex justify-center space-x-4">
+				{types.map((type) => (
 					<button
-						className={`rounded px-4 py-2 ${consumptionType === ConsumptionType.WATER ? 'bg-white text-blue-600' : ''}`}
-						onClick={() => dispatch(setConsumptionType(ConsumptionType.WATER))}
+						key={type.id}
+						onClick={() => handleTypeChange(type.id)}
+						className="flex items-center rounded-lg bg-gray-700 px-4 py-2 text-white hover:bg-blue-600"
 					>
-						Water
+						<span className="mr-2">{type.icon}</span>
+						{type.label}
 					</button>
-					<button
-						className={`rounded px-4 py-2 ${consumptionType === ConsumptionType.ELECTRICITY ? 'bg-white text-blue-600' : ''}`}
-						onClick={() => dispatch(setConsumptionType(ConsumptionType.ELECTRICITY))}
-					>
-						Electricity
-					</button>
-					<button
-						className={`rounded px-4 py-2 ${consumptionType === ConsumptionType.GAS ? 'bg-white text-blue-600' : ''}`}
-						onClick={() => dispatch(setConsumptionType(ConsumptionType.GAS))}
-					>
-						Gas
-					</button>
-				</div>
+				))}
 			</div>
 		</nav>
 	);
